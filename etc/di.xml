@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author @haihv433
+ * @copyright Copyright (c) 2020 Goomento (https://store.goomento.com)
+ * @package Goomento_MomoPayment
+ * @link https://github.com/Goomento/MomoPayment
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Goomento\MomoPayment\Helper\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Goomento\MomoPayment\Helper\Config::CODE</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MomoPaymentLogger" type="Goomento\Base\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="const">Goomento\MomoPayment\Helper\Config::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentGatewayFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">Goomento\MomoPayment\Helper\Config::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Goomento\MomoPayment\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MomoPaymentValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">MomoPaymentValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">MomoPaymentCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MomoPaymentConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">Goomento\MomoPayment\Helper\Config</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MomoPaymentGatewayGlobalValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentGatewayGlobalValidator" type="Magento\Payment\Gateway\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MomoPaymentGatewayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentGatewayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Goomento\MomoPayment\Helper\Config</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="initialize" xsi:type="string">Goomento\MomoPayment\Gateway\Command\InitializeCommand</item>
+                <item name="refund" xsi:type="string">MomoPaymentGatewayRefundCommand</item>
+                <item name="getPayUrl" xsi:type="string">MomoPaymentGatewayGetPayUrlCommand</item>
+                <item name="complete" xsi:type="string">MomoPaymentGatewayCompleteCommand</item>
+                <item name="capture" xsi:type="string">Magento\Payment\Gateway\Command\NullCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentGatewayGetPayUrlCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MomoPaymentGetPayUrlDataBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">MomoPaymentTransferFactory</argument>
+            <argument name="client" xsi:type="object">ZendClient</argument>
+            <argument name="logger" xsi:type="object">MomoPaymentLogger</argument>
+            <argument name="handler" xsi:type="object">Goomento\MomoPayment\Gateway\Response\GetPayUrlHandler</argument>
+            <argument name="validator" xsi:type="object">Goomento\MomoPayment\Gateway\Validator\GetPayUrlValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <!--  Complete command  -->
+    <virtualType name="MomoPaymentGatewayCompleteCommand" type="Goomento\Base\Gateway\Command\LocalCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">MomoPaymentLogger</argument>
+            <argument name="validator" xsi:type="object">Goomento\MomoPayment\Gateway\Validator\CompleteValidator</argument>
+            <argument name="handler" xsi:type="object">Goomento\MomoPayment\Gateway\Response\CompleteHandle</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Request -->
+    <virtualType name="MomoPaymentGatewayRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MomoPaymentRefundRequest</argument>
+            <argument name="handler" xsi:type="object">Goomento\MomoPayment\Gateway\Response\RefundHandler</argument>
+            <argument name="transferFactory" xsi:type="object">MomoPaymentTransferFactory</argument>
+            <argument name="validator" xsi:type="object">Goomento\MomoPayment\Gateway\Validator\RefundValidator</argument>
+            <argument name="client" xsi:type="object">ZendClient</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Goomento\MomoPayment\Helper\Logger">
+        <arguments>
+            <argument name="logger" xsi:type="object">MomoPaymentLogger</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MomoPaymentTransferFactory" type="Goomento\MomoPayment\Gateway\Http\TransferFactory">
+        <arguments>
+            <argument name="config" xsi:type="object">Goomento\MomoPayment\Helper\Config</argument>
+            <argument name="urlPath" xsi:type="const">Goomento\MomoPayment\Gateway\Request\AbstractDataBuilder::PAY_URL_PATH</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="refund" xsi:type="string">RefundTransactionDataBuilder</item>
+                <item name="credential" xsi:type="string">Goomento\MomoPayment\Gateway\Request\CredentialDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\App\Helper\Context">
+        <arguments>
+            <argument name="logger" xsi:type="object">MomoPaymentLogger</argument>
+        </arguments>
+    </type>
+    <virtualType name="ZendClient" type="Goomento\MomoPayment\Gateway\Http\Client\Zend">
+        <arguments>
+            <argument name="logger" xsi:type="object">ZendClientLogger</argument>
+            <argument name="converter" xsi:type="object">Goomento\MomoPayment\Gateway\Http\Converter\JsonToArray</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="ZendClientLogger" type="Magento\Payment\Model\Method\Logger">
+        <arguments>
+            <argument name="logger" xsi:type="object">MomoPaymentLogger</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MomoPaymentGetPayUrlDataBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="getPayUrl" xsi:type="string">GetPayUrlTransactionDataBuilder</item>
+                <item name="credential" xsi:type="string">Goomento\MomoPayment\Gateway\Request\CredentialDataBuilder</item>
+                <item name="callback" xsi:type="string">Goomento\MomoPayment\Gateway\Request\CallBackDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="GetPayUrlTransactionDataBuilder" type="Goomento\MomoPayment\Gateway\Request\GetPayUrlDataBuilder">
+        <arguments>
+            <argument name="requestType" xsi:type="const">Goomento\MomoPayment\Gateway\Request\AbstractDataBuilder::REQUEST_CAPTURE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="RefundTransactionDataBuilder" type="Goomento\MomoPayment\Gateway\Request\RefundDataBuilder">
+        <arguments>
+            <argument name="requestType" xsi:type="const">Goomento\MomoPayment\Gateway\Request\AbstractDataBuilder::REQUEST_REFUND</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Goomento\MomoPayment\Gateway\Command\CompleteCommand">
+        <arguments>
+            <argument name="validator" xsi:type="object">Goomento\MomoPayment\Gateway\Validator\CompleteValidator</argument>
+            <argument name="handler" xsi:type="object">Goomento\MomoPayment\Gateway\Response\CompleteHandle</argument>
+        </arguments>
+    </type>
+</config>

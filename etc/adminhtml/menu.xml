@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author @haihv433
+ * @copyright Copyright (c) 2020 Goomento (https://store.goomento.com)
+ * @package Goomento_MomoPayment
+ * @link https://github.com/Goomento/MomoPayment
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Goomento_MomoPayment::maintext"
+             title="Momo Payment"
+             module="Goomento_MomoPayment"
+             sortOrder="104"
+             parent="Goomento_Base::menu"
+             resource="Goomento_MomoPayment::maintext"/>
+
+        <add id="Goomento_MomoPayment::config"
+             title="Configuration"
+             module="Goomento_MomoPayment"
+             sortOrder="105"
+             parent="Goomento_MomoPayment::maintext"
+             action="adminhtml/system_config/edit/section/payment"
+             resource="Goomento_MomoPayment::config"
+             />
+    </menu>
+</config>

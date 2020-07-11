@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author @haihv433
+ * @copyright Copyright (c) 2020 Goomento (https://store.goomento.com)
+ * @package Goomento_MomoPayment
+ * @link https://github.com/Goomento/MomoPayment
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <momo_payment>
+                <debug>0</debug>
+                <active>0</active>
+                <model>MomoPaymentGatewayFacade</model>
+                <title>Momo Payment</title>
+                <merchant_code />
+                <merchant_private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <merchant_access_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <sandbox_endpoint>https://test-payment.momo.vn</sandbox_endpoint>
+                <production_endpoint>https://payment.momo.vn</production_endpoint>
+                <min_order_total>1</min_order_total>
+                <order_status>pending_payment</order_status>
+                <payment_action>authorize_capture</payment_action>
+                <can_initialize>1</can_initialize>
+                <currency>VND</currency>
+                <environment>sandbox</environment>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <sort_order>10</sort_order>
+                <can_use_for_multishipping>0</can_use_for_multishipping>
+            </momo_payment>
+        </payment>
+    </default>
+</config>
